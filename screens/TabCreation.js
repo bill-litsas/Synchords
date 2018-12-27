@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BackHandler } from "react-native";
 import { Dimensions, Button, TextInput, StyleSheet, Text, View } from 'react-native';
+import firebase from 'react-native-firebase'
 
 export default class TabCreation extends Component {
   _didFocusSubscription;
@@ -8,6 +9,7 @@ export default class TabCreation extends Component {
 
   constructor(props) {
     super(props);
+    this.tabsRef = firebase.firestore().collection('tabs');
     this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
       BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
     );
@@ -16,9 +18,12 @@ export default class TabCreation extends Component {
       canSave: false,
       tabTitle: 'Title'
     }
+
   }
 
   static navigationOptions = ({ navigation }) => {
+    const params = navigation.state.params || {};
+
     return {
       headerLeft: (
         <Text
@@ -28,17 +33,32 @@ export default class TabCreation extends Component {
       ),
       headerRight: (
         <Text
-          onPress={() => alert('Saved Tab')}
-          style={{ marginRight: 10, fontSize: 16 }}
+          onPress={params.handleSave}
+          style={{
+            marginRight: 10,
+            fontSize: 16,
+            color: params.canSave ? '#222' : '#ccc'
+          }}
         >Save</Text>
       )
     };
   };
 
+  componentWillMount() {
+    this._setNavigationParams();
+  }
+
+  _setNavigationParams() {
+    this.props.navigation.setParams({
+      canSave: this.state.canSave
+    });
+  }
+
   componentDidMount() {
     this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
       BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
     );
+    this.props.navigation.setParams({ handleSave: this.saveTab });
   }
 
   onBackButtonPressAndroid = () => {
@@ -48,6 +68,25 @@ export default class TabCreation extends Component {
       return false;
     }
   };
+
+  submitEditTitle = () => {
+    this.setState(
+      {
+        enteringTitle: false,
+        canSave: true
+      },
+      () => { this._setNavigationParams(); }
+    )
+  }
+
+  saveTab = () => {
+    if (this.state.canSave) {
+      this.tabsRef.add({
+        title: this.state.tabTitle
+      });
+      alert('Tab Saved!')
+    }
+  }
 
   componentWillUnmount() {
     this._didFocusSubscription && this._didFocusSubscription.remove();
@@ -62,7 +101,7 @@ export default class TabCreation extends Component {
             autoFocus={true}
             style={styles.tabTitle}
             onChangeText={(text) => this.setState({ tabTitle: text })}
-            onSubmitEditing={() => this.setState({ enteringTitle: false })}
+            onSubmitEditing={() => this.submitEditTitle()}
             value={this.state.tabTitle}
           />
           :
@@ -89,5 +128,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
     color: '#222'
+  },
+  activeTextColor: {
+
   }
 });

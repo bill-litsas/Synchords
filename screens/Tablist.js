@@ -58,7 +58,6 @@ export default class Tablist extends Component {
   }
 
   getTabs = () => {
-
     const tabs = [];
 
     this.ref.get()
