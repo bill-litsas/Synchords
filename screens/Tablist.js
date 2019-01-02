@@ -85,14 +85,29 @@ export default class Tablist extends Component {
 
   }
 
+  goToSong = (title) => {
+    this.props.navigation.navigate('SongViewEdit', {
+      songTitle: title,
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        {/* <Text>Tablist</Text> */}
+
         <FlatList
           data={this.state.tabs}
-          renderItem={({ item }) => <Text key={item.id}>{item.title}</Text>}
+          renderItem={({ item }) =>
+            <Text
+              style={styles.lyricSong}
+              key={item.id}
+              onPress={() => this.goToSong(item.title)}
+            >
+              {item.title}
+            </Text>
+          }
         />
+
       </View>
     );
   }
@@ -101,5 +116,11 @@ export default class Tablist extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  lyricSong: {
+    padding: 10,
+    paddingVertical: 20,
+    backgroundColor: 'red',
+    fontSize: 24
   }
 });
