@@ -97,15 +97,19 @@ export default class Tablist extends Component {
 
         <FlatList
           data={this.state.tabs}
-          renderItem={({ item }) =>
-            <Text
-              style={styles.lyricSong}
-              key={item.id}
-              onPress={() => this.goToSong(item.title)}
-            >
-              {item.title}
-            </Text>
+          renderItem={({ item }) => {
+            if (0) {
+              return <Text
+                style={styles.lyricSong}
+                key={item.id}
+                onPress={() => this.goToSong(item.title)}
+              >
+                {item.title}
+              </Text>
+            }
           }
+          }
+
         />
 
       </View>

@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import firebase from 'react-native-firebase'
-import { StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default class SongViewEdit extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      songTitle: ''
+      songTitle: '',
+      linesRender: []
     }
   }
 
@@ -24,24 +25,30 @@ export default class SongViewEdit extends Component {
     const docRef = firebase.firestore().collection('tabs').doc('2tQQOXTctNcCV9usGqHV');
     const thisClass = this;
 
-    // docRef.get().then(function (doc) {
-    //   if (doc.exists) {
-    //     console.log("Document data:", doc.data());
-    //     const { title } = doc.data();
-    //     thisClass.setState({ songTitle: title })
-    //   } else {
-    //     // doc.data() will be undefined in this case
-    //     console.log("No such document!");
-    //   }
-    // }).catch(function (error) {
-    //   console.log("Error getting document:", error);
-    // });
+    docRef.get().then(function (doc) {
+      if (doc.exists) {
+        console.log("Document data:", doc.data());
+        const { title } = doc.data();
+        thisClass.setState({ songTitle: title })
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }).catch(function (error) {
+      console.log("Error getting document:", error);
+    });
 
     const linesRef = firebase.firestore().collection('tabs').doc('2tQQOXTctNcCV9usGqHV').collection('lines');
 
+    let linesRender = [];
+
     linesRef.get().then(snapshot => {
       const values = snapshot.docs.map(this.flattenDoc);
-      console.table(values);
+      console.log(values);
+      values.sort((a, b) => {
+        return a.position - b.position;
+      });
+      thisClass.setState({ linesRender: values })
     })
 
     // linesRef.get().then(function (doc) {
@@ -57,13 +64,11 @@ export default class SongViewEdit extends Component {
   }
 
   flattenDoc(doc) {
-    return { id: doc.id, ...doc.data() };
+    return { key: doc.id, ...doc.data() };
   }
 
 
   render() {
-
-
 
     return (
       <View style={styles.container}>
@@ -73,6 +78,17 @@ export default class SongViewEdit extends Component {
         >
           {this.state.songTitle}
         </Text>
+
+        <FlatList
+          data={this.state.linesRender}
+          renderItem={
+            ({ item }) => {
+              if (item.type === 'blank') {
+                return <View style={styles.blankLine} />
+              }
+            }
+          }
+        />
 
       </View>
     );
@@ -91,7 +107,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: '#222'
   },
-  activeTextColor: {
-
+  blankLine: {
+    height: 40,
+    backgroundColor: '#eee',
+    borderBottomColor: '#000',
+    borderBottomWidth: 1
   }
 });
