@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import firebase from 'react-native-firebase'
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import DraggableChords from '../components/DraggableChords';
+
+const fullWidth = Dimensions.get('window').width;
+const lyricsTextScale = 30;
 
 export default class SongViewEdit extends Component {
 
@@ -86,6 +90,24 @@ export default class SongViewEdit extends Component {
               if (item.type === 'blank') {
                 return <View style={styles.blankLine} />
               }
+              else if (item.type === 'chords') {
+                const chords = [];
+                {
+                  item.chords.map((chord, index) => {
+                    chords.push(
+                      <DraggableChords
+                        key={index}
+                        posX={chord.position}
+                        chord={chord.chord_name}
+                      />
+                    );
+                  })
+                }
+                return <View style={styles.chordLine}>{chords}</View>
+              }
+              else if (item.type === 'lyrics') {
+                return <Text style={styles.lyricsLine}>{item.lyrics}</Text>
+              }
             }
           }
         />
@@ -112,5 +134,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     borderBottomColor: '#000',
     borderBottomWidth: 1
+  },
+  lyricsLine: {
+    fontSize: Math.round(fullWidth / lyricsTextScale),
+    backgroundColor: 'yellow'
+  },
+  chordLine: {
+    marginTop: 5,
+    backgroundColor: '#d2dbea',
+    width: '100%',
+    height: 50,
+    display: 'flex',
+    flexDirection: 'column'
   }
 });
