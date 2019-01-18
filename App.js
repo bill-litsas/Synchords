@@ -15,7 +15,7 @@ const App = createStackNavigator(
     SongViewEdit
   },
   {
-    initialRouteName: 'SongViewEdit'
+    initialRouteName: 'Tablist'
   }
 )
 

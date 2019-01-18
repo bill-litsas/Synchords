@@ -16,12 +16,12 @@ export default class Tablist extends Component {
 
   static navigationOptions = ({ navigation }) => {
     return {
-      headerTitle: 'Tablist',
+      headerTitle: 'Songlist',
       headerRight: (
         <Text
           onPress={() => navigation.navigate('TabCreation')}
           style={{ marginRight: 10, fontSize: 16 }}
-        >Add tab</Text>
+        >Add song</Text>
       )
     };
   };
@@ -31,7 +31,7 @@ export default class Tablist extends Component {
     //   title: 'Trooper'
     // });
 
-    // this.getTabs();
+    this.getTabs();
 
     this.unsubscribe = this.ref.onSnapshot(this.onCollectionUpdate)
 
@@ -85,9 +85,10 @@ export default class Tablist extends Component {
 
   }
 
-  goToSong = (title) => {
+  goToSong = (title, songId) => {
     this.props.navigation.navigate('SongViewEdit', {
       songTitle: title,
+      songId
     });
   }
 
@@ -98,11 +99,11 @@ export default class Tablist extends Component {
         <FlatList
           data={this.state.tabs}
           renderItem={({ item }) => {
-            if (0) {
+            if (1) {
               return <Text
                 style={styles.lyricSong}
-                key={item.id}
-                onPress={() => this.goToSong(item.title)}
+                key={item.key}
+                onPress={() => this.goToSong(item.title, item.key)}
               >
                 {item.title}
               </Text>
@@ -124,7 +125,8 @@ const styles = StyleSheet.create({
   lyricSong: {
     padding: 10,
     paddingVertical: 20,
-    backgroundColor: 'red',
-    fontSize: 24
+    fontSize: 24,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 2
   }
 });

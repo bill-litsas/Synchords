@@ -18,15 +18,12 @@ export default class SongViewEdit extends Component {
 
   componentDidMount() {
     const { navigation } = this.props;
-    const songTitle = navigation.getParam('songTitle', 'Untitled');
-    // this.setState({ songTitle })
-
-    this.getSongDetails()
-
+    const songId = navigation.getParam('songId');
+    this.getSongDetails(songId);
   }
 
-  getSongDetails() {
-    const docRef = firebase.firestore().collection('tabs').doc('2tQQOXTctNcCV9usGqHV');
+  getSongDetails(songId) {
+    const docRef = firebase.firestore().collection('tabs').doc(songId);
     const thisClass = this;
 
     docRef.get().then(function (doc) {
@@ -55,16 +52,6 @@ export default class SongViewEdit extends Component {
       thisClass.setState({ linesRender: values })
     })
 
-    // linesRef.get().then(function (doc) {
-    //   if (doc.exists) {
-    //     console.log("Line data:", doc.data());
-    //   } else {
-    //     // doc.data() will be undefined in this case
-    //     console.log("No such document!");
-    //   }
-    // }).catch(function (error) {
-    //   console.log("Error getting document:", error);
-    // });
   }
 
   flattenDoc(doc) {
